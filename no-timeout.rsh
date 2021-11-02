@@ -23,10 +23,6 @@ export const main = Reach.App(() => {
         return [called < 3, called];
       })
     );
-    .timeout(absoluteSecs(30), () => {
-      Anybody.publish();
-      return [ false, timesCalled ];
-    });
 
     commit();
     exit();
