@@ -4,10 +4,10 @@ export const main = Reach.App(() => {
   const A = Participant('A', { notify: Fun([], Null) });
   const B = API("B", { helloWorld: Fun([], UInt) });
   deploy();
-  
+
   A.publish();
   commit();
-  
+
   A.interact.notify();
   A.publish();
   assert(balance() == 0);
@@ -17,12 +17,12 @@ export const main = Reach.App(() => {
     .while(keepGoing)
     .api(B.helloWorld,
       (() => 0),
-      ((notify) => {
+      ((k) => {
         const called = timesCalled + 1;
-        notify(called);
+        k(called);
         return [called < 3, called];
       })
-    );
+    )
     .timeout(absoluteSecs(30), () => {
       Anybody.publish();
       return [ false, timesCalled ];
