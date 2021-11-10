@@ -7,7 +7,7 @@ export const initReach = () => {
   if (reach) return
   reach = loadStdlib({
     REACH_CONNECTOR_MODE: 'ALGO',
-    // REACH_DEBUG: 'yes',
+    REACH_DEBUG: 'yes',
   })
   reach.setWalletFallback(
     reach.walletFallback({

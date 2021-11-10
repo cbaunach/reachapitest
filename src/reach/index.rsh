@@ -9,18 +9,40 @@ export const main = Reach.App(() => {
   A.publish();
   A.interact.notify();
 
-  const [keepGoing, timesCalled] = parallelReduce([ true, 0 ])
-    .invariant(balance() == 0)
-    .while(keepGoing)
-    .api(B.helloWorld,
-      (() => 0),
-      ((k) => {
-        const called = timesCalled + 1;
-        k(called);
-        return [called < 3, called];
-      })
-    )
-    .timeout(false);
+  // const [keepGoing, timesCalled] = parallelReduce([ true, 0 ])
+  //   .invariant(balance() == 0)
+  //   .while(keepGoing)
+  //   .api(B.helloWorld,
+  //     (() => 0),
+  //     ((k) => {
+  //       const called = timesCalled + 1;
+  //       k(called);
+  //       return [called < 10, called];
+  //     })
+  //   )
+  //   .timeout(false);
+
+    var [keepGoing, timesCalled] = [ true, 0 ];
+    invariant(balance() == 0);
+    while (keepGoing) {
+      commit()
+
+      const [ [], k ] = call(B.helloWorld).throwTimeout(false);
+      const called = timesCalled + 1;
+      k(called);
+
+      // B.helloWorld.only(() => {
+      //   const [] = declassify(interact.in());
+      //   const called = timesCalled + 1;
+      // });
+      // B.helloWorld.publish(called).throwTimeout(false);
+      // B.helloWorld.only(() => {
+      //   interact.out([], called);
+      // });
+
+      [keepGoing, timesCalled] = [called < 3, called];
+      continue
+    }
 
     commit();
     exit();
