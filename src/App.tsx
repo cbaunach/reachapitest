@@ -11,6 +11,8 @@ function App() {
   const [contract, setContract] = React.useState<any>(null)
   const [isReady, setReady] = React.useState(false)
   const [hittingApi, setApiStatus] = React.useState(false)
+  const [contractID, setContractID] = React.useState<number | undefined>()
+  const inputRef = React.createRef<HTMLInputElement>()
 
   React.useEffect(() => {
     initReach()
@@ -18,26 +20,38 @@ function App() {
 
   const connectWallet = async () => {
     const account = await getAccount()
-    const contract = account.contract(backend)
-    const Ainterface = {
-      notify: () => {
-        setReady(true)
-        console.log('YAYYYY')
-      },
+    let ctcID
+    const ctcInput = (inputRef.current?.value || '')
+    if (ctcInput.length === 0) {
+      const contract = account.contract(backend)
+      const Ainterface = {
+        notify: () => {
+          setReady(true)
+          console.log('YAYYYY')
+        },
+      }
+      backend.A(contract, Ainterface)
+      ctcID = await contract.getInfo()
+      console.log(ctcID, typeof ctcID)
+      setContractID(ctcID)
+    } else {
+      ctcID = parseInt(ctcInput)
+      setContractID(ctcID)
+      setReady(true)
     }
-    backend.A(contract, Ainterface)
     setAccount(account)
-    setContract(contract)
+    setContract(ctcID)
   }
 
   const callApi = async () => {
+    console.log('called')
     if (!isReady) {
       console.log('Not Ready...Please Wait...')
       return
     }
     try {
       setApiStatus(true)
-      const ctc: any = account?.contract(backend, contract.getInfo())
+      const ctc: any = account?.contract(backend, contract)
       const bobApi = ctc.a.B
       console.log('bobApi:', bobApi)
       const test = await bobApi.helloWorld()
@@ -57,7 +71,13 @@ function App() {
           <button disabled={hittingApi} onClick={callApi}>
             {hittingApi ? 'Wait...' : 'Call API'}
           </button>}
-        {!account && <button onClick={connectWallet}>Connect Wallet</button>}
+        {!account && (
+          <>
+            <input ref={inputRef} type="text" />
+            <button onClick={connectWallet}>Connect Wallet</button>
+          </>
+        )}
+        <p>{contractID}</p>
       </header>
     </div>
   )
